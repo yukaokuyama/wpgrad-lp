@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ヘッドレスCMSとは何か — WordPressとの構造的な違い | Headless Migration</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', sans-serif; background: #f5f5f5; color: #1a1a1a; line-height: 1.7; }
+a { color: inherit; }
+
+/* Header */
+#global-header { background: #0a0a0a; border-bottom: 1px solid #1c1c1c; }
+.header-inner { max-width: 900px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; height: 56px; }
+.header-logo { color: #fff; text-decoration: none; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.header-nav { display: flex; align-items: center; gap: 28px; }
+.header-nav a { color: #666; text-decoration: none; font-size: 13px; }
+.header-nav a:hover { color: #fff; }
+.header-nav a.active { color: #fff; }
+.header-nav .header-cta { background: #fff; color: #0a0a0a !important; padding: 7px 18px; font-weight: 700; font-size: 12px; }
+
+/* Article layout */
+#article-hero { background: #0a0a0a; padding: 64px 20px 48px; }
+.article-hero-inner { max-width: 720px; margin: 0 auto; }
+.article-tag { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #555; margin-bottom: 16px; }
+#article-hero h1 { font-size: clamp(22px, 4vw, 36px); font-weight: 700; color: #fff; line-height: 1.35; margin-bottom: 20px; }
+.article-meta { font-size: 12px; color: #444; }
+
+#article-body { background: #fff; padding: 64px 20px 80px; }
+.article-body-inner { max-width: 720px; margin: 0 auto; }
+.article-body-inner h2 { font-size: clamp(18px, 2.5vw, 24px); font-weight: 700; margin: 52px 0 20px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
+.article-body-inner h3 { font-size: 17px; font-weight: 700; margin: 36px 0 14px; }
+.article-body-inner p { font-size: 15px; color: #444; margin-bottom: 20px; line-height: 1.85; }
+.article-body-inner ul { list-style: none; padding: 0; margin: 0 0 20px; }
+.article-body-inner ul li { font-size: 15px; color: #444; padding: 8px 0 8px 20px; position: relative; border-bottom: 1px solid #f5f5f5; line-height: 1.7; }
+.article-body-inner ul li::before { content: "—"; position: absolute; left: 0; color: #bbb; }
+.code-block { background: #0a0a0a; color: #ccc; padding: 20px 24px; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.8; margin: 24px 0; overflow-x: auto; }
+.code-block .comment { color: #555; }
+.note-box { background: #f9f9f9; border-left: 3px solid #0a0a0a; padding: 16px 20px; margin: 28px 0; font-size: 14px; color: #555; }
+.summary-box { background: #0a0a0a; padding: 28px 32px; margin: 48px 0 0; }
+.summary-box p { color: #888; font-size: 14px; margin-bottom: 0; }
+.summary-box h3 { color: #fff; font-size: 16px; margin-bottom: 12px; }
+
+/* CTA */
+#article-cta { background: #f9f9f9; padding: 64px 20px; }
+.article-cta-inner { max-width: 720px; margin: 0 auto; }
+.back-link { display: inline-block; font-size: 13px; color: #888; text-decoration: none; margin-bottom: 48px; }
+.back-link:hover { color: #0a0a0a; }
+.cta-box { background: #0a0a0a; padding: 36px 40px; }
+.cta-box h3 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 12px; }
+.cta-box p { font-size: 14px; color: #666; margin-bottom: 24px; }
+.cta-link { display: inline-block; background: #fff; color: #0a0a0a; padding: 12px 32px; font-size: 14px; font-weight: 700; text-decoration: none; }
+
+/* Footer */
+#global-footer { background: #0a0a0a; padding: 48px 20px; border-top: 1px solid #1c1c1c; }
+.footer-inner { max-width: 900px; margin: 0 auto; }
+.footer-logo { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 20px; }
+.footer-nav { display: flex; gap: 24px; margin-bottom: 32px; }
+.footer-nav a { font-size: 12px; color: #555; text-decoration: none; }
+.footer-nav a:hover { color: #fff; }
+.footer-copy { font-size: 11px; color: #333; }
+</style>
+</head>
+<body>
+
+<header id="global-header">
+  <div class="header-inner">
+    <a href="/" class="header-logo">Headless Migration</a>
+    <nav class="header-nav">
+      <a href="/column/" class="active">コラム</a>
+      <a href="/#cta" class="header-cta">無料相談 →</a>
+    </nav>
+  </div>
+</header>
+
+<section id="article-hero">
+  <div class="article-hero-inner">
+    <p class="article-tag">Architecture</p>
+    <h1>ヘッドレスCMSとは何か<br>— WordPressとの構造的な違い</h1>
+    <p class="article-meta">2025.01 &nbsp;|&nbsp; 読了目安 6分</p>
+  </div>
+</section>
+
+<section id="article-body">
+  <div class="article-body-inner">
+
+    <p>「ヘッドレスCMS」という言葉を聞いたとき、多くの人がまず感じるのは「WordPressとどう違うのか」という疑問です。この記事では、両者の構造的な違いを技術的な観点から整理します。</p>
+
+    <h2>WordPressの構造：モノリシックCMS</h2>
+
+    <p>WordPressは「モノリシックCMS（Monolithic CMS）」と呼ばれる構造を持っています。モノリシックとは、コンテンツ管理・テンプレートエンジン・フロントエンド出力がひとつのシステムに統合されている状態を指します。</p>
+
+    <p>ブラウザがWordPressのページをリクエストしたとき、サーバー上では次の処理が逐次実行されます。</p>
+
+    <div class="code-block">
+<span class="comment">// WordPressのリクエスト処理フロー（概念）</span>
+HTTP Request
+  → PHPが起動
+  → wp-load.php でWordPressを初期化
+  → DBクエリ（投稿・メタ・オプション取得）
+  → テーマのテンプレートファイルを選択
+  → HTMLを生成してレスポンス
+    </div>
+
+    <p>このフローは毎リクエストのたびに発生します。キャッシュプラグイン（W3 Total Cache、WP Super Cacheなど）は生成済みHTMLをディスクに保存して再利用しますが、キャッシュの設定・管理もまた保守コストになります。</p>
+
+    <h2>ヘッドレスCMSの構造：デカップルドアーキテクチャ</h2>
+
+    <p>ヘッドレスCMSは「コンテンツの管理」と「フロントエンドの表示」を分離します。CMSはコンテンツをAPIとして提供するだけで、表示方法には関与しません。</p>
+
+    <div class="code-block">
+<span class="comment">// ヘッドレスCMSのアーキテクチャ（概念）</span>
+[コンテンツ管理]    [ビルドプロセス]      [配信]
+Contentful/Sanity → Next.js/Astro (SSG) → CDN (Vercel/Netlify)
+      ↓                    ↓                    ↓
+   APIで提供        ビルド時にHTML生成      静的ファイルを配信
+    </div>
+
+    <p>重要なポイントは「ビルド時」という点です。コンテンツを更新したときに一度だけHTMLが生成され、その静的ファイルがCDNに配置されます。ブラウザからのリクエストに対しては、CDNが事前生成済みのHTMLを返すだけです。</p>
+
+    <h3>SSGとSSRの違い</h3>
+
+    <p>ヘッドレスCMS構成では、フロントエンドのビルド方式としてSSG（Static Site Generation）とSSR（Server-Side Rendering）の選択があります。</p>
+
+    <ul>
+      <li><strong>SSG</strong>：ビルド時に全ページのHTMLを生成。CDNから静的ファイルを配信。リアルタイム性は低いがパフォーマンスが高い</li>
+      <li><strong>SSR</strong>：リクエスト時にサーバーでHTMLを生成。リアルタイムデータに対応できるが、サーバー実行環境が必要</li>
+      <li><strong>ISR</strong>（Incremental Static Regeneration）：一定時間ごとに静的ファイルを再生成するNext.jsの機能。SSGとSSRの中間的な選択肢</li>
+    </ul>
+
+    <p>更新頻度が低い小規模サイトにはSSGが最も適しています。ビルド後は純粋な静的ファイルになるため、サーバー実行環境が不要でCDNから直接配信できます。</p>
+
+    <h2>CDN配信が速い理由</h2>
+
+    <p>CDN（Content Delivery Network）は世界中にエッジサーバーを持つ配信ネットワークです。ユーザーのリクエストは地理的に最も近いエッジサーバーに届き、事前生成済みのHTMLがそこから返されます。</p>
+
+    <p>WordPressの場合、多くの場合は単一サーバー（日本国内1拠点など）から配信されます。CDN配信との差は特に海外ユーザーへのレスポンスタイムに顕著に出ます。国内ユーザー向けであっても、CDNエッジからの配信はオリジンサーバーへのリクエストを大幅に削減します。</p>
+
+    <h2>コスト構造の違い</h2>
+
+    <p>WordPressはPHP実行環境・MySQLデータベース・十分なメモリを持つサーバーが必要なため、月3,000〜10,000円程度のVPS・共有ホスティングが一般的なコストです。</p>
+
+    <p>SSGによる静的サイトは、HTMLファイルの配信のみでよいため、Vercel・Netlify・Cloudflare Pagesの無料枠で運用できるケースが多くあります。トラフィックが増加すると課金が発生しますが、小規模サイトの通常トラフィックであれば無料〜月1,000円程度で収まることが多いです。</p>
+
+    <div class="note-box">
+      ただし、CMSのコストは別途発生します。Contentfulの無料枠（コンテンツ数に上限あり）やSanityの無料枠（APIリクエスト数に上限あり）の範囲内かどうか確認が必要です。コンテンツ量が多い場合は有料プランが必要になります。
+    </div>
+
+    <h2>小規模サイトに向いている理由</h2>
+
+    <p>ヘッドレスCMSへの移行がすべてのサイトに適しているわけではありません。リアルタイムな会員機能・複雑な検索・大量の動的コンテンツがある場合はSSRやWordPressのままの方が適切なケースもあります。</p>
+
+    <p>一方、以下のような特性を持つサイトでは、SSG構成が合理的です。</p>
+
+    <ul>
+      <li>ページ数が少ない（20ページ以下）</li>
+      <li>コンテンツの更新頻度が低い</li>
+      <li>リアルタイム性が不要（ランキング・在庫表示などがない）</li>
+      <li>会員機能・決済が不要</li>
+    </ul>
+
+    <p>日本には会社案内・士業サイト・小規模店舗のサイトなど、WordPressで構築されているが実態上はほぼ静的なサイトが大量に存在します。これらはSSGに移行しても機能的な差はほとんどなく、パフォーマンス・セキュリティ・保守コストの面で改善が見込めます。</p>
+
+    <div class="summary-box">
+      <h3>まとめ</h3>
+      <p>WordPressはリクエストのたびにPHP+DBが動作するモノリシック構造。ヘッドレスCMSはビルド時にHTMLを生成し、CDNから静的ファイルを配信するデカップルド構造。更新頻度が低い小規模サイトでは、後者の方が構造的にシンプルでコストも低い。</p>
+    </div>
+
+  </div>
+</section>
+
+<section id="article-cta">
+  <div class="article-cta-inner">
+    <a href="/column/" class="back-link">← コラム一覧に戻る</a>
+    <div class="cta-box">
+      <h3>あなたのサイトは移行対象ですか？</h3>
+      <p>サイトURLを送っていただければ、対応可否と費用感をお伝えします。</p>
+      <a href="/#cta" class="cta-link">無料で確認する →</a>
+    </div>
+  </div>
+</section>
+
+<footer id="global-footer">
+  <div class="footer-inner">
+    <p class="footer-logo">Headless Migration</p>
+    <nav class="footer-nav">
+      <a href="/">サービス</a>
+      <a href="/column/">コラム</a>
+      <a href="/#cta">お問い合わせ</a>
+    </nav>
+    <p class="footer-copy">© 2025 Headless Migration</p>
+  </div>
+</footer>
+
+</body>
+</html>

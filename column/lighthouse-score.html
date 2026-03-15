@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lighthouse 90点台を出すために — 静的配信が有利な理由 | Headless Migration</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', sans-serif; background: #f5f5f5; color: #1a1a1a; line-height: 1.7; }
+a { color: inherit; }
+#global-header { background: #0a0a0a; border-bottom: 1px solid #1c1c1c; }
+.header-inner { max-width: 900px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; height: 56px; }
+.header-logo { color: #fff; text-decoration: none; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.header-nav { display: flex; align-items: center; gap: 28px; }
+.header-nav a { color: #666; text-decoration: none; font-size: 13px; }
+.header-nav a:hover { color: #fff; }
+.header-nav a.active { color: #fff; }
+.header-nav .header-cta { background: #fff; color: #0a0a0a !important; padding: 7px 18px; font-weight: 700; font-size: 12px; }
+#article-hero { background: #0a0a0a; padding: 64px 20px 48px; }
+.article-hero-inner { max-width: 720px; margin: 0 auto; }
+.article-tag { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #555; margin-bottom: 16px; }
+#article-hero h1 { font-size: clamp(22px, 4vw, 36px); font-weight: 700; color: #fff; line-height: 1.35; margin-bottom: 20px; }
+.article-meta { font-size: 12px; color: #444; }
+#article-body { background: #fff; padding: 64px 20px 80px; }
+.article-body-inner { max-width: 720px; margin: 0 auto; }
+.article-body-inner h2 { font-size: clamp(18px, 2.5vw, 24px); font-weight: 700; margin: 52px 0 20px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
+.article-body-inner h3 { font-size: 17px; font-weight: 700; margin: 36px 0 14px; }
+.article-body-inner p { font-size: 15px; color: #444; margin-bottom: 20px; line-height: 1.85; }
+.article-body-inner ul { list-style: none; padding: 0; margin: 0 0 20px; }
+.article-body-inner ul li { font-size: 15px; color: #444; padding: 8px 0 8px 20px; position: relative; border-bottom: 1px solid #f5f5f5; line-height: 1.7; }
+.article-body-inner ul li::before { content: "—"; position: absolute; left: 0; color: #bbb; }
+.metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #e8e8e8; margin: 28px 0; }
+.metric-card { background: #fff; padding: 20px; }
+.metric-card-name { font-size: 11px; letter-spacing: 0.1em; color: #888; text-transform: uppercase; margin-bottom: 6px; }
+.metric-card-value { font-size: 13px; font-weight: 700; color: #0a0a0a; margin-bottom: 6px; }
+.metric-card-desc { font-size: 12px; color: #999; line-height: 1.6; margin-bottom: 0; }
+.note-box { background: #f9f9f9; border-left: 3px solid #0a0a0a; padding: 16px 20px; margin: 28px 0; font-size: 14px; color: #555; }
+.warning-box { background: #fff8f0; border-left: 3px solid #e88; padding: 16px 20px; margin: 28px 0; font-size: 14px; color: #666; }
+.summary-box { background: #0a0a0a; padding: 28px 32px; margin: 48px 0 0; }
+.summary-box p { color: #888; font-size: 14px; margin-bottom: 0; }
+.summary-box h3 { color: #fff; font-size: 16px; margin-bottom: 12px; }
+#article-cta { background: #f9f9f9; padding: 64px 20px; }
+.article-cta-inner { max-width: 720px; margin: 0 auto; }
+.back-link { display: inline-block; font-size: 13px; color: #888; text-decoration: none; margin-bottom: 48px; }
+.back-link:hover { color: #0a0a0a; }
+.cta-box { background: #0a0a0a; padding: 36px 40px; }
+.cta-box h3 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 12px; }
+.cta-box p { font-size: 14px; color: #666; margin-bottom: 24px; }
+.cta-link { display: inline-block; background: #fff; color: #0a0a0a; padding: 12px 32px; font-size: 14px; font-weight: 700; text-decoration: none; }
+#global-footer { background: #0a0a0a; padding: 48px 20px; border-top: 1px solid #1c1c1c; }
+.footer-inner { max-width: 900px; margin: 0 auto; }
+.footer-logo { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 20px; }
+.footer-nav { display: flex; gap: 24px; margin-bottom: 32px; }
+.footer-nav a { font-size: 12px; color: #555; text-decoration: none; }
+.footer-nav a:hover { color: #fff; }
+.footer-copy { font-size: 11px; color: #333; }
+@media (max-width: 640px) { .metric-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header id="global-header">
+  <div class="header-inner">
+    <a href="/" class="header-logo">Headless Migration</a>
+    <nav class="header-nav">
+      <a href="/column/" class="active">コラム</a>
+      <a href="/#cta" class="header-cta">無料相談 →</a>
+    </nav>
+  </div>
+</header>
+
+<section id="article-hero">
+  <div class="article-hero-inner">
+    <p class="article-tag">Performance</p>
+    <h1>Lighthouse 90点台を出すために<br>— 静的配信が有利な理由</h1>
+    <p class="article-meta">2025.01 &nbsp;|&nbsp; 読了目安 6分</p>
+  </div>
+</section>
+
+<section id="article-body">
+  <div class="article-body-inner">
+
+    <p>「ヘッドレスCMSに移行するとLighthouseスコアが上がる」という話をよく聞きます。これは大筋では正しいですが、「静的にすれば自動的に90点台になる」は誤りです。この記事では、スコアに影響する要素と静的配信が有利な理由を正確に説明します。</p>
+
+    <h2>Lighthouseとは何を測っているか</h2>
+
+    <p>LighthouseはGoogleが提供するWebパフォーマンス計測ツールです。Chrome DevToolsに組み込まれており、URLを指定するだけで実行できます。スコアはPerformance・Accessibility・Best Practices・SEOの4カテゴリで構成されます。</p>
+
+    <p>パフォーマンススコアは主にCore Web Vitals（CWV）と呼ばれる指標群から計算されます。</p>
+
+    <div class="metric-grid">
+      <div class="metric-card">
+        <p class="metric-card-name">LCP</p>
+        <p class="metric-card-value">Largest Contentful Paint</p>
+        <p class="metric-card-desc">ページ内の最大コンテンツ（画像・テキストブロック）が表示されるまでの時間。2.5秒以内が良好</p>
+      </div>
+      <div class="metric-card">
+        <p class="metric-card-name">INP</p>
+        <p class="metric-card-value">Interaction to Next Paint</p>
+        <p class="metric-card-desc">クリック・タップなどのインタラクションに対するレスポンス速度。200ms以内が良好</p>
+      </div>
+      <div class="metric-card">
+        <p class="metric-card-name">CLS</p>
+        <p class="metric-card-value">Cumulative Layout Shift</p>
+        <p class="metric-card-desc">ページロード中のレイアウトのズレ量。0.1以下が良好。画像のサイズ未指定が主な原因</p>
+      </div>
+    </div>
+
+    <p>2024年以降、FID（First Input Delay）はINPに置き換えられています。古い記事を参照する際は注意が必要です。</p>
+
+    <h2>静的配信がLCPに有利な理由</h2>
+
+    <p>LCPは「最大コンテンツが表示されるまでの時間」です。この指標に最も影響するのはTTFB（Time to First Byte：サーバーが最初のデータを返すまでの時間）です。</p>
+
+    <p>WordPressはリクエストのたびにPHP + DBを動かしてHTMLを生成するため、TTFBが数百ms〜1秒以上になることがあります。特にレンタルサーバー（共有ホスティング）で、PHP処理に時間がかかる環境では顕著です。</p>
+
+    <p>一方、CDNから静的ファイルを配信する構成では、TTFBは数十ms程度になります。エッジサーバーがすでに持っているHTMLファイルをそのまま返すだけだからです。この差がLCPに直結します。</p>
+
+    <h2>CLSへの影響</h2>
+
+    <p>CLSは画像やフォントの読み込みによってレイアウトがズレる現象を測ります。これは静的かどうかよりも、実装の丁寧さに依存します。</p>
+
+    <ul>
+      <li>img要素にwidth/heightを明示していない → レイアウトシフトが発生する</li>
+      <li>Webフォントの読み込みで文字が置き換わる → font-display: swapの設定が必要</li>
+      <li>遅延読み込み（lazy load）の実装が不適切な場合にもシフトが発生する</li>
+    </ul>
+
+    <p>Next.jsなどのフレームワークはImage Componentによって自動的にサイズ属性を付与する機能を持ちますが、設定を省略すると改善されません。</p>
+
+    <h2>静的でもスコアが落ちるケース</h2>
+
+    <p>「ヘッドレスCMS＝高スコア」と単純化することはできません。以下のような実装ではスコアが低くなります。</p>
+
+    <ul>
+      <li><strong>大量のJavaScript</strong>：Reactベースのフレームワークで不必要にクライアントサイドJSを多用すると、TTI（Time to Interactive）が悪化する</li>
+      <li><strong>最適化していない画像</strong>：WebP変換・適切なサイズのリサイズ・圧縮を行わないと、LCPが大きく低下する</li>
+      <li><strong>サードパーティスクリプト</strong>：Google Analytics・チャットウィジェット・広告タグなど外部スクリプトはTBT（Total Blocking Time）に影響する</li>
+      <li><strong>大量のWebフォント</strong>：複数のウェイト・複数のフォントファミリーを読み込むと、LCPが遅延する</li>
+      <li><strong>CDNキャッシュの設定ミス</strong>：キャッシュが機能していない場合、オリジンサーバーへの毎回リクエストが発生する</li>
+    </ul>
+
+    <div class="warning-box">
+      逆に言えば、これらを適切に実装すれば、WordPressでも高スコアを出すことは可能です。キャッシュプラグイン・画像最適化プラグイン・CDNを正しく設定したWordPressサイトはLighthouse 90点台を出せます。「静的かどうか」よりも「実装の質」の方が影響が大きい場面もあります。
+    </div>
+
+    <h2>静的配信が「有利な理由」の本質</h2>
+
+    <p>静的配信が高スコアを出しやすい本質的な理由は、「最適化のベースラインが高い」ことです。</p>
+
+    <p>WordPressでLighthouse高スコアを実現するには、追加のプラグイン・設定・知識が必要です。キャッシュ・画像最適化・CSS/JSの遅延読み込み・クリティカルCSSの抽出など、それぞれ専門的な設定が要ります。</p>
+
+    <p>SSG構成では、これらの多くがフレームワークのデフォルトに含まれています。Next.jsのImage Componentは自動的にWebP変換・リサイズ・遅延読み込みを処理します。静的配信は最初から「速い」のではなく、「最適化された状態になりやすい構造」である、という理解が正確です。</p>
+
+    <h3>「高スコアを出しやすい構成」という表現について</h3>
+
+    <p>LPなどで「高スコアを出しやすい構成（静的配信）」という表現を使う理由はここにあります。「確実に90点になる」ではなく「最適化のハードルが低い」という意味です。実際のスコアは実装の質・画像・外部スクリプトの量によって変わります。</p>
+
+    <div class="note-box">
+      Lighthouseのスコアはラボデータ（測定時の環境によって変動する）です。実際のユーザー体験を測るにはCrUX（Chrome User Experience Report）のフィールドデータも合わせて確認することが推奨されます。
+    </div>
+
+    <div class="summary-box">
+      <h3>まとめ</h3>
+      <p>LCPにはTTFBが直結し、CDN静的配信はTTFBを大幅に改善する。ただし画像の最適化・JSの量・サードパーティスクリプトの影響はどの構成でも存在する。静的配信は「高スコアが保証される」のではなく「最適化のベースラインが高い構成」という理解が正確。</p>
+    </div>
+
+  </div>
+</section>
+
+<section id="article-cta">
+  <div class="article-cta-inner">
+    <a href="/column/" class="back-link">← コラム一覧に戻る</a>
+    <div class="cta-box">
+      <h3>あなたのサイトは移行対象ですか？</h3>
+      <p>サイトURLを送っていただければ、対応可否と費用感をお伝えします。</p>
+      <a href="/#cta" class="cta-link">無料で確認する →</a>
+    </div>
+  </div>
+</section>
+
+<footer id="global-footer">
+  <div class="footer-inner">
+    <p class="footer-logo">Headless Migration</p>
+    <nav class="footer-nav">
+      <a href="/">サービス</a>
+      <a href="/column/">コラム</a>
+      <a href="/#cta">お問い合わせ</a>
+    </nav>
+    <p class="footer-copy">© 2025 Headless Migration</p>
+  </div>
+</footer>
+
+</body>
+</html>

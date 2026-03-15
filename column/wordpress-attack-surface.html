@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WordPressが攻撃されやすい理由と、静的サイトで変わること | Headless Migration</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', sans-serif; background: #f5f5f5; color: #1a1a1a; line-height: 1.7; }
+a { color: inherit; }
+#global-header { background: #0a0a0a; border-bottom: 1px solid #1c1c1c; }
+.header-inner { max-width: 900px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; height: 56px; }
+.header-logo { color: #fff; text-decoration: none; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.header-nav { display: flex; align-items: center; gap: 28px; }
+.header-nav a { color: #666; text-decoration: none; font-size: 13px; }
+.header-nav a:hover { color: #fff; }
+.header-nav a.active { color: #fff; }
+.header-nav .header-cta { background: #fff; color: #0a0a0a !important; padding: 7px 18px; font-weight: 700; font-size: 12px; }
+#article-hero { background: #0a0a0a; padding: 64px 20px 48px; }
+.article-hero-inner { max-width: 720px; margin: 0 auto; }
+.article-tag { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #555; margin-bottom: 16px; }
+#article-hero h1 { font-size: clamp(22px, 4vw, 36px); font-weight: 700; color: #fff; line-height: 1.35; margin-bottom: 20px; }
+.article-meta { font-size: 12px; color: #444; }
+#article-body { background: #fff; padding: 64px 20px 80px; }
+.article-body-inner { max-width: 720px; margin: 0 auto; }
+.article-body-inner h2 { font-size: clamp(18px, 2.5vw, 24px); font-weight: 700; margin: 52px 0 20px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
+.article-body-inner h3 { font-size: 17px; font-weight: 700; margin: 36px 0 14px; }
+.article-body-inner p { font-size: 15px; color: #444; margin-bottom: 20px; line-height: 1.85; }
+.article-body-inner ul { list-style: none; padding: 0; margin: 0 0 20px; }
+.article-body-inner ul li { font-size: 15px; color: #444; padding: 8px 0 8px 20px; position: relative; border-bottom: 1px solid #f5f5f5; line-height: 1.7; }
+.article-body-inner ul li::before { content: "—"; position: absolute; left: 0; color: #bbb; }
+.code-block { background: #0a0a0a; color: #ccc; padding: 20px 24px; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.8; margin: 24px 0; overflow-x: auto; }
+.code-block .comment { color: #555; }
+.note-box { background: #f9f9f9; border-left: 3px solid #0a0a0a; padding: 16px 20px; margin: 28px 0; font-size: 14px; color: #555; }
+.warning-box { background: #fff8f0; border-left: 3px solid #e88; padding: 16px 20px; margin: 28px 0; font-size: 14px; color: #666; }
+.attack-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
+.attack-table th { padding: 12px 16px; background: #0a0a0a; color: #fff; text-align: left; font-size: 12px; }
+.attack-table td { padding: 12px 16px; border-bottom: 1px solid #eee; vertical-align: top; }
+.attack-table td:first-child { font-weight: 600; color: #333; width: 35%; }
+.attack-table .exists { color: #c00; font-size: 13px; }
+.attack-table .reduced { color: #080; font-size: 13px; }
+.summary-box { background: #0a0a0a; padding: 28px 32px; margin: 48px 0 0; }
+.summary-box p { color: #888; font-size: 14px; margin-bottom: 0; }
+.summary-box h3 { color: #fff; font-size: 16px; margin-bottom: 12px; }
+#article-cta { background: #f9f9f9; padding: 64px 20px; }
+.article-cta-inner { max-width: 720px; margin: 0 auto; }
+.back-link { display: inline-block; font-size: 13px; color: #888; text-decoration: none; margin-bottom: 48px; }
+.back-link:hover { color: #0a0a0a; }
+.cta-box { background: #0a0a0a; padding: 36px 40px; }
+.cta-box h3 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 12px; }
+.cta-box p { font-size: 14px; color: #666; margin-bottom: 24px; }
+.cta-link { display: inline-block; background: #fff; color: #0a0a0a; padding: 12px 32px; font-size: 14px; font-weight: 700; text-decoration: none; }
+#global-footer { background: #0a0a0a; padding: 48px 20px; border-top: 1px solid #1c1c1c; }
+.footer-inner { max-width: 900px; margin: 0 auto; }
+.footer-logo { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 20px; }
+.footer-nav { display: flex; gap: 24px; margin-bottom: 32px; }
+.footer-nav a { font-size: 12px; color: #555; text-decoration: none; }
+.footer-nav a:hover { color: #fff; }
+.footer-copy { font-size: 11px; color: #333; }
+</style>
+</head>
+<body>
+
+<header id="global-header">
+  <div class="header-inner">
+    <a href="/" class="header-logo">Headless Migration</a>
+    <nav class="header-nav">
+      <a href="/column/" class="active">コラム</a>
+      <a href="/#cta" class="header-cta">無料相談 →</a>
+    </nav>
+  </div>
+</header>
+
+<section id="article-hero">
+  <div class="article-hero-inner">
+    <p class="article-tag">Security</p>
+    <h1>WordPressが攻撃されやすい理由と、<br>静的サイトで変わること</h1>
+    <p class="article-meta">2025.01 &nbsp;|&nbsp; 読了目安 7分</p>
+  </div>
+</section>
+
+<section id="article-body">
+  <div class="article-body-inner">
+
+    <p>「WordPressはセキュリティリスクが高い」という話はよく聞きます。しかし「なぜ高いのか」「静的サイトにするとどこが変わるのか」を正確に理解している人は意外と少ない。この記事では攻撃経路を一つひとつ整理します。</p>
+
+    <h2>WordPressが攻撃対象になりやすい構造的な理由</h2>
+
+    <p>WordPressがセキュリティ的に難しい理由は、シェアの高さと構造の複雑さの両方にあります。</p>
+
+    <p>世界のWebサイトの約40%がWordPressで動いています。これは攻撃者にとって、一つの脆弱性を見つければ膨大な数のサイトに適用できることを意味します。攻撃の多くは自動化されたボットによる大規模スキャンで、特定のサイトを狙うのではなく「インターネット上のWordPressサイト全体」を対象にしています。</p>
+
+    <h2>主な攻撃経路</h2>
+
+    <h3>① wp-login.php への総当たり攻撃（ブルートフォース）</h3>
+
+    <p>WordPressのログインURL（/wp-login.php）は全インストールで共通です。ボットは大量のIDとパスワードの組み合わせを試し続けます。</p>
+
+    <div class="code-block">
+<span class="comment">// 典型的なログインスキャン（概念）</span>
+POST /wp-login.php
+  user: admin
+  pass: password123  → 失敗
+POST /wp-login.php
+  user: admin
+  pass: admin123     → 失敗
+POST /wp-login.php
+  ...（数千〜数万回繰り返す）
+    </div>
+
+    <p>対策としてログインURLの変更・2FAの導入・IP制限などがありますが、これらはプラグインや設定変更が必要で、維持管理のコストが発生します。</p>
+
+    <h3>② プラグインの脆弱性</h3>
+
+    <p>WordPressの脆弱性の大半はコアではなくプラグインに存在します。WPScanのデータベースには数万件のプラグイン脆弱性が登録されています。代表的な脆弱性の種類は以下のとおりです。</p>
+
+    <ul>
+      <li>SQLインジェクション（SQLi）：入力値を適切にエスケープせずDBクエリに渡すことで、不正なSQLを実行される</li>
+      <li>クロスサイトスクリプティング（XSS）：管理画面や投稿に不正なJavaScriptを注入される</li>
+      <li>リモートコード実行（RCE）：任意のコードをサーバー上で実行される。最も深刻なクラス</li>
+      <li>権限昇格：認証済みの低権限ユーザーが管理者権限を取得する</li>
+      <li>ファイルインクルージョン：サーバー上の任意ファイルを読み込まれる</li>
+    </ul>
+
+    <p>問題は、これらの脆弱性が「プラグインのアップデート」によって修正されますが、更新しないまま放置されたサイトが多数存在することです。更新頻度が低い小規模サイトほど、このリスクが高くなります。</p>
+
+    <h3>③ データベースへの不正アクセス</h3>
+
+    <p>WordPressはコンテンツをMySQLデータベースに格納しています。SQLiが成立した場合、攻撃者はユーザーのパスワードハッシュ・メールアドレス・サイト設定などを取得できます。</p>
+
+    <p>また、wp-config.php にはデータベースの接続情報（ホスト・ユーザー名・パスワード）が平文で記載されています。このファイルへのアクセス制限が不十分な場合、直接読み取られるリスクもあります。</p>
+
+    <h3>④ xmlrpc.php の悪用</h3>
+
+    <p>xmlrpc.php はWordPressのリモートAPI機能を提供するファイルです。現在はREST APIに置き換えられましたが、後方互換性のために残っています。この機能を悪用した増幅攻撃（1リクエストで複数のログイン試行が可能）やDDoS攻撃の踏み台としての利用が知られています。</p>
+
+    <h2>静的サイトへの移行で変わること</h2>
+
+    <p>SSGによる静的サイト構成では、上記の攻撃経路の多くが構造的に存在しなくなります。</p>
+
+    <table class="attack-table">
+      <thead>
+        <tr>
+          <th>攻撃経路</th>
+          <th>WordPress</th>
+          <th>静的サイト（SSG）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>wp-login.php への攻撃</td>
+          <td class="exists">存在する</td>
+          <td class="reduced">存在しない（管理画面は別ドメインのCMS）</td>
+        </tr>
+        <tr>
+          <td>プラグイン脆弱性</td>
+          <td class="exists">常に管理が必要</td>
+          <td class="reduced">WordPressプラグインは存在しない</td>
+        </tr>
+        <tr>
+          <td>データベースへの攻撃</td>
+          <td class="exists">存在する（SQLi等）</td>
+          <td class="reduced">配信サーバーにDBなし</td>
+        </tr>
+        <tr>
+          <td>xmlrpc.php 悪用</td>
+          <td class="exists">存在する</td>
+          <td class="reduced">存在しない</td>
+        </tr>
+        <tr>
+          <td>PHPコード実行</td>
+          <td class="exists">PHPが動作している</td>
+          <td class="reduced">PHPが存在しない（静的ファイル配信）</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>静的サイトでも残るリスク</h2>
+
+    <p>正確に理解するために、移行しても残るリスクも明示します。</p>
+
+    <ul>
+      <li><strong>フォームの実装</strong>：お問い合わせフォームをFormspreeやfunctionなどのサービスで実装する場合、そのサービス自体のセキュリティに依存する。スパム・フィッシング対策が必要</li>
+      <li><strong>CMS管理画面</strong>：ContentfulやSanityなどのCMS管理画面は引き続きログインが必要。2FA設定・強力なパスワード管理は必須</li>
+      <li><strong>CDN・ホスティングの設定ミス</strong>：Vercel・Netlifyの設定を誤ると、意図しないファイルが公開されるリスクがある</li>
+      <li><strong>依存パッケージの脆弱性</strong>：Next.js・Astroなどのフロントエンドフレームワークとnpmパッケージも定期的な更新が必要</li>
+      <li><strong>GitHubリポジトリの公開設定</strong>：ソースコードをパブリックリポジトリで管理する場合、API KeyやTokenをコードに含めてしまうリスクがある</li>
+    </ul>
+
+    <div class="warning-box">
+      「静的サイトにすればセキュリティリスクがゼロになる」は誤りです。正確には「WordPress特有の攻撃経路が構造的に減る」です。残存するリスクへの対応は引き続き必要です。
+    </div>
+
+    <h2>保守の観点から見たリスク管理コスト</h2>
+
+    <p>WordPressのセキュリティ対策で特にコストがかかるのは「継続的な更新管理」です。コアのアップデート・プラグインのアップデート・PHPバージョンの追従・バックアップの確認。これらは月次〜週次で発生する作業です。</p>
+
+    <p>一方、SSG構成ではWordPressコア・プラグインの更新は不要になります。フロントエンドフレームワーク（Next.jsなど）の更新は必要ですが、頻度・緊急度はWordPressのプラグイン更新より低い傾向があります。</p>
+
+    <div class="summary-box">
+      <h3>まとめ</h3>
+      <p>WordPressは世界シェア40%ゆえに大規模スキャンの標的になりやすく、ログイン画面・プラグイン・DB・xmlrpc.phpが主な攻撃経路。SSGへの移行でこれらの経路は構造的に減る。ただしフォーム・CMS管理画面・CDN設定ミスなど残存リスクも存在するため、「ゼロリスク」という表現は正確ではない。</p>
+    </div>
+
+  </div>
+</section>
+
+<section id="article-cta">
+  <div class="article-cta-inner">
+    <a href="/column/" class="back-link">← コラム一覧に戻る</a>
+    <div class="cta-box">
+      <h3>あなたのサイトは移行対象ですか？</h3>
+      <p>サイトURLを送っていただければ、対応可否と費用感をお伝えします。</p>
+      <a href="/#cta" class="cta-link">無料で確認する →</a>
+    </div>
+  </div>
+</section>
+
+<footer id="global-footer">
+  <div class="footer-inner">
+    <p class="footer-logo">Headless Migration</p>
+    <nav class="footer-nav">
+      <a href="/">サービス</a>
+      <a href="/column/">コラム</a>
+      <a href="/#cta">お問い合わせ</a>
+    </nav>
+    <p class="footer-copy">© 2025 Headless Migration</p>
+  </div>
+</footer>
+
+</body>
+</html>

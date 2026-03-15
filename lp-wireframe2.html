@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ヘッドレスCMS移行サービス — LP ワイヤーフレーム</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', sans-serif; background: #f5f5f5; color: #1a1a1a; line-height: 1.7; }
+.section { padding: 80px 20px; max-width: 900px; margin: 0 auto; }
+.label { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: #888; margin-bottom: 12px; }
+h1 { font-size: clamp(28px, 5vw, 52px); font-weight: 700; line-height: 1.2; margin-bottom: 24px; }
+h2 { font-size: clamp(22px, 3.5vw, 36px); font-weight: 700; margin-bottom: 32px; }
+h3 { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+p { margin-bottom: 16px; color: #444; }
+.divider { border: none; border-top: 1px solid #e0e0e0; margin: 0; }
+
+/* ── Global Header ── */
+#global-header { background: #0a0a0a; border-bottom: 1px solid #1c1c1c; position: relative; z-index: 100; }
+.header-inner { max-width: 900px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; height: 56px; }
+.header-logo { color: #fff; text-decoration: none; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.header-nav { display: flex; align-items: center; gap: 28px; }
+.header-nav a { color: #666; text-decoration: none; font-size: 13px; letter-spacing: 0.03em; transition: color 0.15s; }
+.header-nav a:hover { color: #fff; }
+.header-nav .header-cta { background: #fff; color: #0a0a0a !important; padding: 7px 18px; font-weight: 700; font-size: 12px; letter-spacing: 0.05em; }
+
+/* ── Column Teaser ── */
+#column-teaser { background: #f9f9f9; }
+.column-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #e8e8e8; margin-top: 32px; }
+.column-card { background: #fff; padding: 24px 20px; text-decoration: none; display: block; }
+.column-card:hover { background: #fafafa; }
+.column-card-tag { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #999; margin-bottom: 10px; }
+.column-card-title { font-size: 14px; font-weight: 700; color: #1a1a1a; line-height: 1.55; margin-bottom: 10px; }
+.column-card-excerpt { font-size: 12px; color: #888; line-height: 1.7; margin-bottom: 0; }
+.column-more { display: inline-block; margin-top: 28px; font-size: 13px; color: #0a0a0a; text-decoration: none; border-bottom: 1px solid #0a0a0a; padding-bottom: 2px; }
+.column-more:hover { opacity: 0.6; }
+
+/* ── Global Footer ── */
+#global-footer { background: #0a0a0a; padding: 48px 20px; }
+.footer-inner { max-width: 900px; margin: 0 auto; }
+.footer-logo { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 20px; }
+.footer-nav { display: flex; gap: 24px; margin-bottom: 32px; }
+.footer-nav a { font-size: 12px; color: #555; text-decoration: none; }
+.footer-nav a:hover { color: #fff; }
+.footer-copy { font-size: 11px; color: #333; }
+
+/* ── FV ── */
+#fv { background: #0a0a0a; color: #fff; padding: 100px 20px 80px; max-width: 100%; }
+#fv .inner { max-width: 900px; margin: 0 auto; }
+#fv .label { color: #666; }
+#fv h1 { color: #fff; }
+#fv .subtitle { font-size: 18px; color: #aaa; margin-bottom: 16px; }
+#fv .spec-line { font-size: 13px; color: #555; margin-bottom: 8px; }
+.cta-btn { display: inline-block; background: #fff; color: #0a0a0a; padding: 16px 40px; font-size: 15px; font-weight: 700; text-decoration: none; letter-spacing: 0.05em; margin-top: 40px; }
+
+/* ── Target ── */
+#target { background: #fff; }
+.target-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px; }
+.target-box { padding: 24px 28px; border: 1px solid #e8e8e8; }
+.target-box.fit { border: 2px solid #0a0a0a; }
+.target-box-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #999; margin-bottom: 14px; }
+.target-box.fit .target-box-label { color: #0a0a0a; font-weight: 700; }
+.target-check-list { list-style: none; padding: 0; }
+.target-check-list li { padding: 8px 0 8px 24px; position: relative; font-size: 14px; color: #444; border-bottom: 1px solid #f0f0f0; }
+.target-check-list li:last-child { border-bottom: none; }
+.target-check-list li::before { content: "✓"; position: absolute; left: 0; color: #0a0a0a; font-weight: 700; }
+.target-check-list.no li { color: #999; }
+.target-check-list.no li::before { content: "—"; color: #bbb; }
+.target-pain-intro { font-size: 15px; color: #555; margin: 48px 0 20px; padding-top: 40px; border-top: 1px solid #eee; }
+.problem-list { list-style: none; padding: 0; }
+.problem-list li { padding: 16px 0; border-bottom: 1px solid #f0f0f0; font-size: 15px; color: #444; padding-left: 24px; position: relative; }
+.problem-list li::before { content: "—"; position: absolute; left: 0; color: #999; }
+
+/* ── Value (ROI) ── */
+#value { background: #fff; }
+.value-alt-table { width: 100%; border-collapse: collapse; margin: 32px 0; }
+.value-alt-table td { padding: 16px 20px; font-size: 15px; border-bottom: 1px solid #eee; vertical-align: middle; }
+.value-alt-table td:first-child { color: #666; font-size: 14px; }
+.value-alt-table td:last-child { font-weight: 700; color: #0a0a0a; text-align: right; white-space: nowrap; }
+.value-alt-table tr.this-service td { background: #0a0a0a; color: #fff; }
+.value-alt-table tr.this-service td:first-child { color: #aaa; }
+.value-alt-table tr.this-service td:last-child { color: #fff; }
+.value-cost-box { background: #f9f9f9; border: 1px solid #e8e8e8; padding: 28px 32px; margin: 32px 0 0; }
+.value-cost-box h3 { font-size: 14px; font-weight: 700; color: #666; margin-bottom: 20px; letter-spacing: 0.03em; }
+.value-cost-row { display: flex; justify-content: space-between; align-items: baseline; padding: 11px 0; border-bottom: 1px solid #eee; font-size: 14px; gap: 16px; }
+.value-cost-row .cost-label { color: #666; }
+.value-cost-row .cost-num { font-weight: 600; color: #444; white-space: nowrap; }
+.value-cost-total { display: flex; justify-content: space-between; align-items: baseline; padding: 16px 0 0; margin-top: 4px; font-size: 15px; font-weight: 700; gap: 16px; }
+.value-cost-total .cost-num { color: #0a0a0a; font-size: 18px; white-space: nowrap; }
+.value-conclusion { background: #0a0a0a; color: #fff; padding: 22px 28px; margin-top: 24px; font-size: 15px; line-height: 1.8; }
+.value-conclusion .value-note { color: #666; font-size: 12px; display: block; margin-top: 10px; }
+
+/* ── Site type tags ── */
+.site-type-tags { margin-top: 28px; }
+.site-type-label { font-size: 12px; color: #999; letter-spacing: 0.05em; margin-bottom: 12px; }
+.tag-list { display: flex; flex-wrap: wrap; gap: 10px; }
+.site-tag { display: inline-block; padding: 6px 16px; border: 1px solid #e0e0e0; font-size: 13px; color: #555; background: #f9f9f9; }
+
+/* ── Case ── */
+#case { background: #fff; }
+.case-card { border: 1px solid #e8e8e8; padding: 32px 36px; }
+.case-card-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #888; margin-bottom: 6px; }
+.case-card-title { font-size: 16px; font-weight: 700; color: #0a0a0a; margin-bottom: 0; padding-bottom: 24px; border-bottom: 1px solid #eee; }
+.case-metrics { display: flex; flex-direction: column; }
+.case-metric { display: grid; grid-template-columns: 130px 1fr 20px 1fr; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #f4f4f4; }
+.case-metric:last-child { border-bottom: none; }
+.metric-name { font-size: 13px; color: #888; }
+.metric-before { font-size: 14px; color: #bbb; text-decoration: line-through; }
+.metric-arrow { color: #ccc; text-align: center; font-size: 12px; }
+.metric-after { font-size: 16px; font-weight: 700; color: #0a0a0a; }
+.case-disclaimer { font-size: 12px; color: #bbb; margin-top: 20px; margin-bottom: 0; padding-top: 20px; border-top: 1px solid #f0f0f0; }
+
+/* ── About ── */
+#about { background: #f9f9f9; }
+.about-box { padding: 36px 40px; border: 1px solid #ddd; background: #fff; }
+.about-career { font-size: 18px; font-weight: 700; color: #0a0a0a; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+.about-box p { font-size: 15px; color: #555; }
+
+/* ── Compare ── */
+#compare { background: #f9f9f9; }
+.compare-intro { font-size: 15px; color: #666; margin-bottom: 40px; }
+.compare-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.compare-table th { padding: 14px 16px; text-align: left; background: #0a0a0a; color: #fff; font-weight: 600; font-size: 13px; }
+.compare-table td { padding: 14px 16px; border-bottom: 1px solid #e8e8e8; vertical-align: top; }
+.compare-table tr:nth-child(even) td { background: #f4f4f4; }
+.compare-table .item-col { font-weight: 600; color: #333; width: 22%; }
+.compare-table .wp-col { width: 39%; color: #666; }
+.compare-table .hl-col { width: 39%; color: #0a0a0a; }
+.compare-note { font-size: 13px; color: #888; margin-top: 24px; font-style: italic; }
+
+/* ── Speed ── */
+#speed { background: #fff; }
+.flow-box { background: #f9f9f9; border: 1px solid #e0e0e0; padding: 24px 32px; margin-bottom: 24px; }
+.flow-box .flow-label { font-size: 11px; letter-spacing: 0.1em; color: #888; margin-bottom: 12px; text-transform: uppercase; }
+.flow-steps { font-size: 14px; color: #555; line-height: 2; }
+.flow-steps .arrow { color: #bbb; }
+.speed-note { font-size: 14px; color: #555; margin-top: 20px; }
+
+/* ── Security ── */
+#security { background: #f9f9f9; }
+.attack-list { list-style: none; padding: 0; margin: 16px 0; }
+.attack-list li { padding: 8px 0 8px 20px; position: relative; font-size: 14px; color: #555; border-bottom: 1px solid #ebebeb; }
+.attack-list li::before { content: "·"; position: absolute; left: 0; color: #999; font-size: 20px; line-height: 1; top: 6px; }
+.security-result { background: #fff; border-left: 3px solid #0a0a0a; padding: 16px 20px; margin: 24px 0; font-size: 15px; }
+.security-disclaimer { font-size: 13px; color: #999; margin-top: 16px; border-top: 1px solid #eee; padding-top: 16px; }
+
+/* ── How ── */
+#how { background: #fff; }
+.step-list { list-style: none; counter-reset: step; }
+.step-list li { counter-increment: step; padding: 24px 0; border-bottom: 1px solid #f0f0f0; padding-left: 48px; position: relative; }
+.step-list li::before { content: counter(step); position: absolute; left: 0; top: 24px; width: 28px; height: 28px; background: #0a0a0a; color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.step-list li h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.step-list li p { font-size: 14px; color: #666; margin: 0; }
+
+/* ── Pricing ── */
+.price-scope { background: #111; border: 1px solid #333; padding: 24px 32px; margin-bottom: 40px; }
+.price-scope h3 { color: #fff; font-size: 15px; margin-bottom: 16px; }
+.price-scope ul { list-style: none; padding: 0; }
+.price-scope ul li { padding: 6px 0; font-size: 14px; color: #888; padding-left: 16px; position: relative; }
+.price-scope ul li::before { content: "·"; position: absolute; left: 0; color: #555; font-size: 20px; line-height: 1; top: 2px; }
+.price-scope .custom-note { font-size: 13px; color: #666; margin-top: 16px; padding-top: 16px; border-top: 1px solid #222; margin-bottom: 0; }
+.price-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: #222; }
+.price-card { background: #111; padding: 40px 32px; }
+.price-card.featured { background: #fff; color: #0a0a0a; }
+.price-card .plan-name { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: #666; margin-bottom: 16px; }
+.price-card.featured .plan-name { color: #888; }
+.price-card .price-num { font-size: 42px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.price-card.featured .price-num { color: #0a0a0a; }
+.price-card .price-sub { font-size: 13px; color: #555; margin-bottom: 24px; }
+.price-card.featured .price-sub { color: #888; }
+.price-card ul { list-style: none; padding: 0; }
+.price-card ul li { font-size: 13px; color: #666; padding: 6px 0; border-bottom: 1px solid #1a1a1a; }
+.price-card.featured ul li { color: #555; border-bottom-color: #eee; }
+
+/* ── WP Disclaimer ── */
+#wp-note { background: #f9f9f9; }
+.wp-disclaimer-box { border: 1px solid #ddd; padding: 40px; background: #fff; }
+.wp-disclaimer-box p { font-size: 15px; color: #555; }
+.wp-disclaimer-box .wp-note-sub { font-size: 13px; color: #999; margin-top: 0; padding-top: 20px; border-top: 1px solid #eee; }
+
+/* ── FAQ ── */
+#faq { background: #fff; }
+.faq-list { list-style: none; }
+.faq-item { padding: 32px 0; border-bottom: 1px solid #e0e0e0; }
+.faq-q { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+.faq-q::before { content: "Q. "; color: #bbb; }
+.faq-a { font-size: 14px; color: #555; }
+.faq-a ul { list-style: none; padding-left: 0; margin: 12px 0; }
+.faq-a ul li { padding: 5px 0 5px 16px; position: relative; }
+.faq-a ul li::before { content: "·"; position: absolute; left: 0; color: #999; font-size: 20px; line-height: 1; top: 1px; }
+.faq-demerit-note { display: block; margin-top: 16px; padding-top: 16px; border-top: 1px solid #eee; color: #777; }
+
+/* ── CTA ── */
+.contact-box { background: #111; border: 1px solid #222; padding: 40px; margin-top: 40px; }
+.contact-box p { color: #666; font-size: 14px; }
+.contact-box .contact-link { display: inline-block; background: #fff; color: #0a0a0a; padding: 14px 36px; font-size: 14px; font-weight: 700; text-decoration: none; margin-top: 24px; }
+
+@media (max-width: 640px) {
+  .price-grid { grid-template-columns: 1fr; }
+  .compare-table { font-size: 12px; }
+  .compare-table th, .compare-table td { padding: 10px 8px; }
+  .target-grid { grid-template-columns: 1fr; }
+  .wp-disclaimer-box { padding: 24px; }
+}
+</style>
+</head>
+<body>
+
+<header id="global-header">
+  <div class="header-inner">
+    <a href="/lp-wireframe2.html" class="header-logo">Headless Migration</a>
+    <nav class="header-nav">
+      <a href="/column/">コラム</a>
+      <a href="#cta" class="header-cta">無料相談 →</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ① FV -->
+<section id="fv">
+  <div class="inner">
+    <p class="label">Headless CMS Migration Service</p>
+    <h1>WordPressの保守から<br>解放される。<br>小規模サイト専用の<br>移行サービス。</h1>
+    <p class="subtitle">20ページ以下のサイトを4〜8週間で移行。<br>表示速度・セキュリティ・保守コストを構造ごと改善します。</p>
+    <p class="spec-line">対象：20ページ以下 / 特殊機能なし / 小規模サイト</p>
+    <p class="spec-line">料金：150,000円〜 / 期間：4〜8週間</p>
+    <a href="#cta" class="cta-btn">無料相談を予約する →</a>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ② 対象サイト（旧 Problem を統合） -->
+<section id="target">
+  <div class="section">
+    <p class="label">For whom</p>
+    <h2>まず確認：<br>あなたのサイトは対象ですか？</h2>
+    <div class="target-grid">
+      <div class="target-box fit">
+        <p class="target-box-label">向いているサイト</p>
+        <ul class="target-check-list">
+          <li>総ページ数が20ページ以下</li>
+          <li>更新頻度が低い（月1〜数回程度）</li>
+          <li>会員機能・決済・予約なし</li>
+          <li>問い合わせフォームのみ</li>
+          <li>既存デザインをそのまま継続したい</li>
+        </ul>
+      </div>
+      <div class="target-box">
+        <p class="target-box-label">別途ご相談が必要なサイト</p>
+        <ul class="target-check-list no">
+          <li>会員ログイン・マイページあり</li>
+          <li>EC・決済機能あり</li>
+          <li>予約システム連携あり</li>
+          <li>複雑なデータベース処理あり</li>
+          <li>20ページ超の大規模サイト</li>
+        </ul>
+      </div>
+    </div>
+    <div class="site-type-tags">
+      <p class="site-type-label">こんなサイトが対象です</p>
+      <div class="tag-list">
+        <span class="site-tag">会社案内サイト</span>
+        <span class="site-tag">士業サイト</span>
+        <span class="site-tag">小規模店舗サイト</span>
+        <span class="site-tag">コーポレートLP</span>
+        <span class="site-tag">サービス紹介サイト</span>
+      </div>
+    </div>
+
+    <p class="target-pain-intro">こんな状況、続いていませんか？</p>
+    <ul class="problem-list">
+      <li>毎月のプラグイン更新・バックアップが地味に手間</li>
+      <li>サーバー費用が月5,000〜10,000円かかっている</li>
+      <li>ページ表示が遅い気がするが、何が原因かわからない</li>
+      <li>セキュリティ対策に不安があるが、対応できていない</li>
+      <li>サイト更新の頻度は低いのに、維持コストが高い</li>
+    </ul>
+    <p style="margin-top:32px;font-size:15px;color:#555;">WordPressの小規模サイトは攻撃対象になりやすい傾向があります。特に、更新されないプラグイン・古いテーマ・ログイン画面の公開などがある場合、自動スキャンの対象になることがあります。</p>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ③ Value：料金を見る前に「出す意味」を見せる -->
+<section id="value">
+  <div class="section">
+    <p class="label">Value</p>
+    <h2>この料金を<br>出す意味</h2>
+    <p style="font-size:15px;color:#555;">「15〜25万円」は単体で見ると高く感じるかもしれません。<br>他の選択肢と並べると、話が変わります。</p>
+
+    <table class="value-alt-table">
+      <tr>
+        <td>サイトリニューアル（一から再制作）</td>
+        <td>50〜150万円</td>
+      </tr>
+      <tr>
+        <td>WordPress保守委託（年間）</td>
+        <td>12〜24万円 × 毎年</td>
+      </tr>
+      <tr>
+        <td>ハッキング・改ざん被害の復旧</td>
+        <td>10〜50万円（発生時）</td>
+      </tr>
+      <tr class="this-service">
+        <td>このサービス（移行・一回払い）</td>
+        <td>15〜25万円</td>
+      </tr>
+    </table>
+
+    <div class="value-cost-box">
+      <h3>「現在の年間コスト」を足し算すると</h3>
+      <div class="value-cost-row">
+        <span class="cost-label">サーバー費用（月7,000円の場合）</span>
+        <span class="cost-num">84,000円 / 年</span>
+      </div>
+      <div class="value-cost-row">
+        <span class="cost-label">プラグイン更新・バックアップ作業（月2時間）</span>
+        <span class="cost-num">24時間 / 年</span>
+      </div>
+      <div class="value-cost-row">
+        <span class="cost-label">セキュリティインシデント対応（発生時）</span>
+        <span class="cost-num">——</span>
+      </div>
+      <div class="value-cost-total">
+        <span>サーバー費用だけで3年合計</span>
+        <span class="cost-num">約25万円</span>
+      </div>
+    </div>
+
+    <div class="value-conclusion">
+      移行費用は、3年分のサーバー代とほぼ同額。<br>そこから先は、ずっとコストが下がります。
+      <span class="value-note">※ 上記はあくまで試算です。実際の金額はサイト構成・利用サービスにより異なります。</span>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ④ Pricing -->
+<section id="price" style="background:#0a0a0a;">
+  <div class="section">
+    <p class="label" style="color:#555;">Pricing</p>
+    <h2 style="color:#fff;">料金</h2>
+    <div class="price-scope">
+      <h3>対象サイトの条件</h3>
+      <p style="font-size:14px;color:#888;margin-bottom:16px;">小規模サイトに特化することで作業を標準化し、価格を抑えています。<br>以下の条件のサイトが対象です。</p>
+      <ul>
+        <li>20ページ以下</li>
+        <li>特殊機能なし</li>
+        <li>会員機能なし</li>
+        <li>予約 / 決済なし</li>
+      </ul>
+      <p class="custom-note">これらがある場合はCUSTOMプランになります。</p>
+    </div>
+    <div class="price-grid">
+      <div class="price-card">
+        <p class="plan-name">BASIC</p>
+        <p class="price-num">¥150,000</p>
+        <p class="price-sub">〜10ページ / 1回払い</p>
+        <ul>
+          <li>コンテンツ移行（〜10P）</li>
+          <li>ヘッドレスCMS構築</li>
+          <li>CDN設定</li>
+          <li>SEO引き継ぎ対応</li>
+          <li>操作説明</li>
+        </ul>
+      </div>
+      <div class="price-card featured">
+        <p class="plan-name">STANDARD</p>
+        <p class="price-num">¥250,000</p>
+        <p class="price-sub">〜20ページ / 1回払い</p>
+        <ul>
+          <li>コンテンツ移行（〜20P）</li>
+          <li>ヘッドレスCMS構築</li>
+          <li>CDN設定</li>
+          <li>SEO引き継ぎ対応</li>
+          <li>操作説明 + 動画マニュアル</li>
+        </ul>
+      </div>
+      <div class="price-card">
+        <p class="plan-name">CUSTOM</p>
+        <p class="price-num">要相談</p>
+        <p class="price-sub">20P超 / 特殊機能あり</p>
+        <ul>
+          <li>ページ数・機能に応じて個別対応</li>
+          <li>フォーム・予約・決済など</li>
+          <li>既存デザインの再現</li>
+          <li>詳細はお問い合わせください</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ④ Compare -->
+<section id="compare">
+  <div class="section">
+    <p class="label">Compare</p>
+    <h2>WordPress vs ヘッドレスCMS<br>何がどう変わるのか</h2>
+    <p class="compare-intro">同じサイトでも、裏側の仕組みを変えることで<br>運用や表示の特徴が大きく変わります。</p>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th class="item-col">項目</th>
+          <th class="wp-col">WordPress</th>
+          <th class="hl-col">ヘッドレスCMS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="item-col">表示速度</td>
+          <td class="wp-col">2〜5秒（構成や最適化状況による）</td>
+          <td class="hl-col">高速化しやすい構成（CDN配信）</td>
+        </tr>
+        <tr>
+          <td class="item-col">セキュリティリスク</td>
+          <td class="wp-col">プラグイン脆弱性などの管理が必要</td>
+          <td class="hl-col">WordPress特有の攻撃経路（ログイン画面・プラグイン脆弱性など）が構造的に減る</td>
+        </tr>
+        <tr>
+          <td class="item-col">毎月の保守作業</td>
+          <td class="wp-col">プラグイン更新・バックアップなどが必要</td>
+          <td class="hl-col">保守対象が少ない</td>
+        </tr>
+        <tr>
+          <td class="item-col">サーバー費用</td>
+          <td class="wp-col">月3,000〜10,000円程度</td>
+          <td class="hl-col">無料〜1,000円程度のケースが多い（構成・トラフィックによる）</td>
+        </tr>
+        <tr>
+          <td class="item-col">SEO</td>
+          <td class="wp-col">現状維持</td>
+          <td class="hl-col">URL変更なしで移行可能（SEO設定は引き継ぎ対応）</td>
+        </tr>
+        <tr>
+          <td class="item-col">Lighthouse</td>
+          <td class="wp-col">構成により30〜60程度</td>
+          <td class="hl-col">高スコアを出しやすい構成（静的配信）</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="compare-note">※ 数値は一般的な目安です。サイトの構成・規模・最適化状況によって異なります。</p>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- Case：移行事例 -->
+<section id="case">
+  <div class="section">
+    <p class="label">Case</p>
+    <h2>移行事例</h2>
+    <p style="font-size:15px;color:#555;margin-bottom:32px;">実際の移行で、何がどれだけ変わったか。</p>
+    <div class="case-card">
+      <p class="case-card-label">企業サイト / 12ページ</p>
+      <p class="case-card-title">WordPress → Headless CMS（Contentful + Vercel）</p>
+      <div class="case-metrics">
+        <div class="case-metric">
+          <span class="metric-name">表示速度</span>
+          <span class="metric-before">3.8秒</span>
+          <span class="metric-arrow">→</span>
+          <span class="metric-after">0.9秒</span>
+        </div>
+        <div class="case-metric">
+          <span class="metric-name">サーバー費用</span>
+          <span class="metric-before">月6,000円</span>
+          <span class="metric-arrow">→</span>
+          <span class="metric-after">月0円</span>
+        </div>
+        <div class="case-metric">
+          <span class="metric-name">保守作業</span>
+          <span class="metric-before">月2時間</span>
+          <span class="metric-arrow">→</span>
+          <span class="metric-after">ほぼ不要</span>
+        </div>
+        <div class="case-metric">
+          <span class="metric-name">Lighthouse</span>
+          <span class="metric-before">54</span>
+          <span class="metric-arrow">→</span>
+          <span class="metric-after">91</span>
+        </div>
+      </div>
+      <p class="case-disclaimer">※ 実際の数値をもとにした参考例です。構成・環境・最適化状況により異なります。</p>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ⑤ Why / Speed -->
+<section id="speed">
+  <div class="section">
+    <p class="label">Why / Speed</p>
+    <h2>表示速度：<br>なぜ速くなるのか</h2>
+    <p>WordPressはページ表示のたびに処理が発生します。</p>
+    <div class="flow-box">
+      <p class="flow-label">WordPress の処理フロー</p>
+      <p class="flow-steps">PHP処理<br><span class="arrow">↓</span><br>データベース問い合わせ<br><span class="arrow">↓</span><br>HTML生成<br><span class="arrow">↓</span><br>ブラウザに送信</p>
+    </div>
+    <div class="flow-box">
+      <p class="flow-label">ヘッドレスCMS の処理フロー</p>
+      <p class="flow-steps">あらかじめ生成されたHTML<br><span class="arrow">↓</span><br>CDNから直接配信<br><span class="arrow">↓</span><br>ブラウザに送信</p>
+    </div>
+    <p class="speed-note">そのため、小規模サイトでは表示速度が大きく改善するケースが多くなります。</p>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ⑥ Why / Security（表現修正済み） -->
+<section id="security">
+  <div class="section">
+    <p class="label">Why / Security</p>
+    <h2>セキュリティ：<br>なぜリスクが下がるのか</h2>
+    <p>WordPress特有の攻撃経路（ログイン画面・プラグイン脆弱性など）が構造的に減ります。</p>
+    <p>WordPressへの攻撃の多くは以下が入口になります。</p>
+    <ul class="attack-list">
+      <li>ログイン画面（/wp-login.php）への総当たり攻撃</li>
+      <li>プラグインの脆弱性を突いたコード実行</li>
+      <li>データベースへの不正アクセス</li>
+    </ul>
+    <div class="security-result">
+      WordPress特有のこれらの攻撃経路が構造的に減るため、攻撃対象が大きく減ります。
+    </div>
+    <p class="security-disclaimer">※ フォームやCMS管理画面・CDN設定など、完全にリスクがゼロになるわけではありません。構成・外部サービス連携によってはリスクが残る場合もあります。</p>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ⑦ How it works -->
+<section id="how">
+  <div class="section">
+    <p class="label">How it works</p>
+    <h2>移行の流れ</h2>
+    <ul class="step-list">
+      <li><h4>ヒアリング・現状確認</h4><p>サイト規模・構成・要件を確認します。移行が合わないと判断した場合は、その旨を正直にお伝えします。無理に進めることはありません。</p></li>
+      <li><h4>移行設計・ご提案</h4><p>最適な構成（CMS選定・ホスティング等）をご提案します。</p></li>
+      <li><h4>構築・コンテンツ移行</h4><p>既存コンテンツをヘッドレスCMSに移行。デザインも再現します。</p></li>
+      <li><h4>動作確認・SEOチェック</h4><p>URL・リダイレクト・表示確認を行います。</p></li>
+      <li><h4>公開・引き渡し</h4><p>本番公開後、操作方法をご説明します。</p></li>
+    </ul>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- Column teaser -->
+<section id="column-teaser">
+  <div class="section">
+    <p class="label">Column</p>
+    <h2>技術コラム</h2>
+    <p style="font-size:15px;color:#555;">ヘッドレスCMS・WordPressの仕組みを技術的に解説します。</p>
+    <div class="column-cards">
+      <a href="/column/headless-cms-basics.html" class="column-card">
+        <p class="column-card-tag">Architecture</p>
+        <p class="column-card-title">ヘッドレスCMSとは何か — WordPressとの構造的な違い</p>
+        <p class="column-card-excerpt">なぜ静的配信が速いのか。モノリシックとデカップルドの違いから解説します。</p>
+      </a>
+      <a href="/column/wordpress-attack-surface.html" class="column-card">
+        <p class="column-card-tag">Security</p>
+        <p class="column-card-title">WordPressが攻撃されやすい理由と、静的サイトで変わること</p>
+        <p class="column-card-excerpt">wp-login.php・プラグイン脆弱性・DB露出。攻撃経路を整理して説明します。</p>
+      </a>
+      <a href="/column/lighthouse-score.html" class="column-card">
+        <p class="column-card-tag">Performance</p>
+        <p class="column-card-title">Lighthouse 90点台を出すために — 静的配信が有利な理由</p>
+        <p class="column-card-excerpt">Core Web Vitals（LCP・INP・CLS）と静的配信の関係を技術的に説明します。</p>
+      </a>
+    </div>
+    <a href="/column/" class="column-more">コラム一覧を見る →</a>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- About：制作者について -->
+<section id="about">
+  <div class="section">
+    <p class="label">About</p>
+    <h2>制作者について</h2>
+    <div class="about-box">
+      <p class="about-career">Web制作・WordPress運用歴 約20年</p>
+      <p>企業サイト・サービスサイトなど、100サイト以上の運用・改善に関わってきました。</p>
+      <p>WordPressの運用を長く経験してきたからこそ、小規模サイトにはオーバースペックになりやすいこと、更新頻度が低いサイトでは保守コストが積み上がることを実感しています。</p>
+      <p>今回のサービスは、「小規模サイトにとって合理的な構造」を提案するために作りました。</p>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ⑧ WordPress免責文（新規追加） -->
+<section id="wp-note">
+  <div class="section">
+    <p class="label">About WordPress</p>
+    <h2>WordPressを<br>否定しているわけではありません。</h2>
+    <div class="wp-disclaimer-box">
+      <p>私たちはWordPressを否定しているわけではありません。</p>
+      <p>実際に20年近くWordPressを運用してきた経験から、小規模サイトではよりシンプルな構成の方が合理的なケースが多いと感じています。</p>
+      <p>現在WordPressを利用していて「まだ移行するべきか判断できない」という方には、WordPressのメンテナンス・保守のみのご相談も可能です。</p>
+      <p class="wp-note-sub">※ WordPressが最適な場合は、その旨をお伝えしています。</p>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ⑨ FAQ -->
+<section id="faq">
+  <div class="section">
+    <p class="label">FAQ</p>
+    <h2>よくある質問</h2>
+    <ul class="faq-list">
+      <li class="faq-item">
+        <p class="faq-q">移行後もコンテンツ更新はできますか？</p>
+        <p class="faq-a">はい。ヘッドレスCMS（Contentful / Sanity など）の管理画面から更新できます。WordPressと操作感は異なりますが、テキスト・画像の更新は直感的に行えます。</p>
+      </li>
+      <li class="faq-item">
+        <p class="faq-q">SEOへの影響はありますか？</p>
+        <p class="faq-a">URL構造を変更しないため、基本的にSEOへの悪影響は最小限に抑えられます。表示速度の改善によってCore Web Vitalsが向上するケースもあります。</p>
+      </li>
+      <li class="faq-item">
+        <p class="faq-q">今のデザインは変わりますか？</p>
+        <p class="faq-a">デザインはそのまま再現します。ただし、既存テーマへの依存が強い場合は一部調整が必要になることがあります。</p>
+      </li>
+      <li class="faq-item">
+        <p class="faq-q">移行期間中、既存サイトは止まりますか？</p>
+        <p class="faq-a">既存WordPressサイトを稼働させたまま並行して構築します。切り替えはDNS変更のみで、ダウンタイムは最小化できます。</p>
+      </li>
+      <li class="faq-item">
+        <p class="faq-q">ヘッドレスCMSのデメリットはありますか？</p>
+        <p class="faq-a">あります。例えば以下のような点があります。
+          <ul>
+            <li>更新フローがWordPressと少し変わる</li>
+            <li>リアルタイムプレビューは構成による</li>
+            <li>プラグインのような拡張は少ない</li>
+          </ul>
+          <span class="faq-demerit-note">ただし、更新頻度が低い小規模サイトではこれらが問題になるケースは少ないため、移行のメリットが上回ることが多いです。</span>
+        </p>
+      </li>
+    </ul>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ⑩ CTA -->
+<section id="cta" style="background:#0a0a0a;">
+  <div class="section">
+    <p class="label" style="color:#555;">Contact</p>
+    <h2 style="color:#fff;">まずは移行できるかだけ、<br>無料で確認する</h2>
+    <p style="color:#888;">サイトURLを送っていただければ、<br>対応可否・費用感・期間をまとめてお伝えします。</p>
+    <div class="contact-box">
+      <p>現在のサイトURLと「ページ数」「主な悩み」を添えてご連絡ください。<br>2営業日以内に返信します。</p>
+      <a href="/contact" class="contact-link">あなたのサイトが移行対象か、無料で確認する →</a>
+      <p style="margin-top:24px;padding-top:20px;border-top:1px solid #222;font-size:13px;color:#555;">ヒアリングの結果、移行が合わないと判断した場合は、その旨をお伝えします。<br>「とりあえず話だけ聞く」でかまいません。</p>
+    </div>
+  </div>
+</section>
+
+
+<footer id="global-footer">
+  <div class="footer-inner">
+    <p class="footer-logo">Headless Migration</p>
+    <nav class="footer-nav">
+      <a href="/lp-wireframe2.html">サービス</a>
+      <a href="/column/">コラム</a>
+      <a href="#cta">お問い合わせ</a>
+    </nav>
+    <p class="footer-copy">© 2025 Headless Migration</p>
+  </div>
+</footer>
+
+</body>
+</html>
